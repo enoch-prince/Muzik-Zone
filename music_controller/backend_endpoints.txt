@@ -1,0 +1,5 @@
+view-room
+get-room
+create-room
+join-room
+leave-room

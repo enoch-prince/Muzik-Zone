@@ -1,0 +1,4 @@
+.vscode
+*.pyc
+*.lock
+music_controller/frontend/node_modules
