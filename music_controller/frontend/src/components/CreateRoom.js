@@ -205,8 +205,8 @@ export default class CreateRoom extends Component {
           </FormControl>
         </Grid>
         {this.props.update
-          ? this.renderUpdateButtons
-          : this.renderUpdateButtons()}
+          ? this.renderUpdateButtons()
+          : this.renderCreateButtons()}
       </Grid>
     );
   }

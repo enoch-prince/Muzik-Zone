@@ -83,7 +83,7 @@ export default class Room extends Component {
   renderSettings() {
     return (
       <Grid container spacing={1}>
-        <Grid item xs={12} aligned="center">
+        <Grid item xs={12} align="center">
           <CreateRoom
             update={true}
             votesToSkip={this.state.votesToSkip}
@@ -92,7 +92,7 @@ export default class Room extends Component {
             updateCallback={this.getRoomDetails}
           />
         </Grid>
-        <Grid item xs={12} aligned="center">
+        <Grid item xs={12} align="center">
           <Button
             variant="contained"
             color="secondary"
