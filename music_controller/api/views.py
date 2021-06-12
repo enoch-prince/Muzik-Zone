@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from .models import Room
-from .serializers import RoomSerializer, CreateRoomSerializer
+from .serializers import RoomSerializer, CreateRoomSerializer, UpdateRoomSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -89,6 +89,35 @@ class LeaveRoom(APIView):
         
         return Response({'message': 'Success'}, status=status.HTTP_200_OK)
 
+class UpdateRoom(APIView):
+    serializer_class = UpdateRoomSerializer
+
+    def patch(self, request, format=None):
+        if not self.request.session.exists(request.session.session_key):
+            self.request.session.create()
+        
+        serializer = self.serializer_class(data=request.data)
+        if not serializer.is_valid():
+            return Response({"Bad Request": "Invalid Data!"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        votesToSkip = serializer.data.get("votes_to_skip")
+        guestCanPause = serializer.data.get("guest_can_pause")
+        code = serializer.data.get("code")
+
+        queryset = Room.objects.filter(code=code)
+        if not queryset.exists():
+            return Response({"Not Found": f"Room with code <{code}> does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+        
+        room  = queryset[0]
+        userid = self.request.session.session_key
+        if room.host != userid:
+            return Response({"Forbidden": "You're no the host of this room!"}, status=status.HTTP_403_FORBIDDEN)
+        
+        room.votes_to_skip = votesToSkip
+        room.guest_can_pause = guestCanPause
+        room.save(update_fields=["votes_to_skip", "guest_can_pause"])
+        return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
+
 # This holds all the custom views created to automate the creation of urls paths
 # It must correlate with the endpoints in the "backend_endpoints.txt" file
 # Restart the server when you edit the "backend_endpoints.txt" file
@@ -97,7 +126,8 @@ AllCustomViewClasses = {
     'get': GetRoom,
     'create': CreateRoomView,
     'join': JoinRoom,
-    'leave': LeaveRoom
+    'leave': LeaveRoom,
+    'update': UpdateRoom
 }
 
 
