@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 django = "*"
 djangorestframework = "*"
+django-environ = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"
