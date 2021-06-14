@@ -1,6 +1,8 @@
 from django.urls import path
 from .views import AllCustomViewClasses, GetApiEndpoints, GetUserRoomCode
 
+app_name = "api"
+
 with open('backend_endpoints.txt', 'r') as file:
     endpoints = [endpoint.strip() for endpoint in file.readlines()]
     if not endpoints:

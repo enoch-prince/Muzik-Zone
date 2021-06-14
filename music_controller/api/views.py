@@ -38,24 +38,26 @@ class CreateRoomView(APIView):
         
         serializer = self.serializer_class(data=request.data)
 
-        if serializer.is_valid():
-            votes_to_skip = serializer.data.get('votes_to_skip')
-            guest_can_pause = serializer.data.get('guest_can_pause')
-            host = self.request.session.session_key
-            queryset = Room.objects.filter(host=host)
+        if not serializer.is_valid():
+            return Response({"Bad Requst": "Data is invalid!"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        votes_to_skip = serializer.data.get('votes_to_skip')
+        guest_can_pause = serializer.data.get('guest_can_pause')
+        host = self.request.session.session_key
+        queryset = Room.objects.filter(host=host)
 
-            if queryset.exists():
-                room = queryset[0]
-                room.guest_can_pause = guest_can_pause
-                room.votes_to_skip = votes_to_skip
-                room.save(update_fields=['guest_can_pause', 'votes_to_skip'])
-                self.request.session["room_code"] = room.code
-                return Response(data=RoomSerializer(room).data, status=status.HTTP_202_ACCEPTED)
-            else:
-                room = Room(host=host, guest_can_pause=guest_can_pause, votes_to_skip=votes_to_skip)
-                room.save()
-                self.request.session["room_code"] = room.code
-                return Response(data=RoomSerializer(room).data, status=status.HTTP_201_CREATED)
+        if queryset.exists():
+            room = queryset[0]
+            room.guest_can_pause = guest_can_pause
+            room.votes_to_skip = votes_to_skip
+            room.save(update_fields=['guest_can_pause', 'votes_to_skip'])
+            self.request.session["room_code"] = room.code
+            return Response(data=RoomSerializer(room).data, status=status.HTTP_202_ACCEPTED)
+        else:
+            room = Room(host=host, guest_can_pause=guest_can_pause, votes_to_skip=votes_to_skip)
+            room.save()
+            self.request.session["room_code"] = room.code
+            return Response(data=RoomSerializer(room).data, status=status.HTTP_201_CREATED)
 
 class JoinRoom(APIView):
     lookup_url_kwargs = 'code'
